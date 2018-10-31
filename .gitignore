@@ -7,3 +7,7 @@ third_lib/googletest
 # Jet Brains
 .idea/
 cmake-build-debug/
+
+# doc tmp file
+docs/~*.doc
+docs/~*.pptx
