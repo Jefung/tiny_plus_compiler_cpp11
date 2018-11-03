@@ -219,15 +219,18 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                         status = Status::single_quote;
                         break;
                     case CharType::c_special_char:
+                        std::cout << word << "||" << std::endl;
                         if ((word == ":" || word == "<" || word == ">") && c == '=') {
                             word += c;
                             cur_line_tokens.emplace_back(Kind::Type::SYM, word);
                             word = "";
                             status = Status::blank;
                         } else {
-                            word = "";
-                            status = Status::error;
-                            err_msgs.emplace_back(ErrorMsg(line_count, column_count, "非>=,<=,:=的双特殊字符"));
+                            cur_line_tokens.emplace_back(Kind::Type::SYM, word);
+                            word = c;
+                            // word = "";
+                            // status = Status::error;
+                            // err_msgs.mplace_back(ErrorMsg(line_count, column_count, "非>=,<=,:=的双特殊字符"));
                         }
                         break;
                     case CharType::c_illegal:
@@ -286,12 +289,13 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
         case Status::error:
         case Status::letter:
             if (Kind::is_KEY(word))
-                tokens.emplace_back(Kind::Type::KEY, word);
+                cur_line_tokens.emplace_back(Kind::Type::KEY, word);
             else
-                tokens.emplace_back(Kind::Type::ID, word);
+                cur_line_tokens.emplace_back(Kind::Type::ID, word);
             break;
         case Status::special_char:
-            tokens.emplace_back(Kind::SYM, word);
+            cur_line_tokens.emplace_back(Kind::SYM, word);
+            break;
         case Status::single_quote:
             err_msgs.emplace_back(ErrorMsg(line_count, column_count - word.size(), "字符串缺少单引号匹配"));
             break;
