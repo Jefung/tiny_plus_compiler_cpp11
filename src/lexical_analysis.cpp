@@ -299,9 +299,10 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
             err_msgs.emplace_back(ErrorMsg(line_count, column_count - word.size(), "注释标识符缺少匹配"));
             break;
         case Status::number:
-            tokens.emplace_back(Kind::NUM, word);
+            cur_line_tokens.emplace_back(Kind::NUM, word);
             break;
     }
+    tokens.insert(tokens.end(), cur_line_tokens.begin(), cur_line_tokens.end());
     // for (auto token : tokens)
     //     std::cout << Kind::name(token.first) << " : " << token.second << std::endl;
     // for (auto msg : err_msgs)
