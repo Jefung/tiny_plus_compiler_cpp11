@@ -1,0 +1,3 @@
+int fact;
+write fact;
+write fact;

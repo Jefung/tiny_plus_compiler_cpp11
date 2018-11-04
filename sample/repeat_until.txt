@@ -1,0 +1,4 @@
+int A,B,C,D;
+repeat
+		A:=A*2
+until (A+C)<=(B+D)

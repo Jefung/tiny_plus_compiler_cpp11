@@ -1,0 +1,16 @@
+int funcname ( int a, bool b, string c)
+    int d;
+    if A=1 	then
+        A := B + D
+    else
+	    A:= C * B
+    end
+end
+bool isEmpty ( int a1, bool b2, string c3)
+    int d;
+    if A=1 	then
+        A := B + D
+    else
+	    A:= C * B
+    end
+end

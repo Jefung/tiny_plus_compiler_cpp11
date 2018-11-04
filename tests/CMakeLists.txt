@@ -8,7 +8,7 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src)
 
 # 将test_开头的文件视为单元测试文件
 file(GLOB_RECURSE test_files "test_*.cpp")
-add_executable(Unit_Tests_run ${test_files})
+add_executable(Unit_Tests_run ${test_files} common.cpp)
 
 # 链接gtest的库
 target_link_libraries(Unit_Tests_run gtest gtest_main)

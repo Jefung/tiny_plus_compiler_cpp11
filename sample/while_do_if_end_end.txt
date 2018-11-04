@@ -1,0 +1,6 @@
+int A,B,C,D;
+while x>0	do
+    if A=1 	then
+       A := B + D;
+    end
+end

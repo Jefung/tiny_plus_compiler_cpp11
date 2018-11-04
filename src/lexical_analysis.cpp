@@ -219,7 +219,6 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                         status = Status::single_quote;
                         break;
                     case CharType::c_special_char:
-                        std::cout << word << "||" << std::endl;
                         if ((word == ":" || word == "<" || word == ">") && c == '=') {
                             word += c;
                             cur_line_tokens.emplace_back(Kind::Type::SYM, word);
