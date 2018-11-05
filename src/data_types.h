@@ -1,16 +1,21 @@
 //
-// Created by JefungChan on 2018/10/26.
+// Created by JefungChan on 2018/11/4.
 //
 
-#ifndef TINY_PLUS_COMPILER_DATA_TYPE_H
-#define TINY_PLUS_COMPILER_DATA_TYPE_H
+#ifndef TINY_COMPILER_CPP11_DATA_TYPES_H
+#define TINY_COMPILER_CPP11_DATA_TYPES_H
+
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include <map>
 
-class Kind {
+class Token {
+private:
+    static std::string kind_names_[];
 public:
-    enum Type {
+    enum class Kind : char {
         KEY, //保留字
         SYM, //特殊符号
         ID, //标识符
@@ -50,21 +55,53 @@ public:
         TK_EQU,
         END_OF_FILE,
     };
+    Kind kind;
+    std::string value;
+    int line;
+    unsigned long column;
 
-    // print enum name
-    static std::string name(Type type);
+    Token(Kind kind, std::string value, int line = 0, unsigned long column = 0);
 
-    // return the string is key or not
+    Token();
+
+    std::string kind_name();
+
+    static std::string kind_name(Kind kind);
+
     static bool is_KEY(const std::string &str);
 
-    static std::pair<Kind::Type, std::string> token_thining(std::pair<Kind::Type, std::string> type);
-
-    using Token  = std::pair<Type, std::string>;
-
-    static std::vector<Token>
-    tokens_thining(std::vector<std::pair<Type, std::string>>);
+    void to_thin();
 };
 
+class Tokens {
+private:
+    std::vector<Token> tokens_;
+public:
+    void to_thin();
+
+    void push(Token token);
+
+    void push(Token::Kind kind, std::string value, int line = 0, unsigned long column = 0);
+
+    void clear();
+
+    void append(Tokens tokens);
+
+    std::vector<Token>::iterator begin();
+
+    std::vector<Token>::iterator end();
+
+    Token back();
+
+    friend bool operator==(const Tokens &t1, const Tokens &t2);
+
+    unsigned long size() const;
+
+    Token &operator[](int index);
+
+    Token operator[](int index) const;
+
+};
 
 struct ErrorMsg {
     int line;
@@ -78,20 +115,47 @@ struct ErrorMsg {
     std::string to_string();
 };
 
-typedef std::pair<Kind::Type, std::string> Token;
-using Tokens = std::vector<std::pair<Kind::Type, std::string>>;
-
-class Sym {
-
-};
-
+using ErrorMsgs = std::vector<ErrorMsg>;
 enum ValType {
     VT_INT,         // 整型数类型
     VT_BOOL,        // 布尔类型
     VT_STRING,      // 字符串类型
 };
+enum ObjType {
+    OT_FUN,         // 函数
+    OT_VAR,         // 变量
+    OT_CONST,       // 常量
+};
+
+struct Sym {
+    Token tk;          // 符号(词法分析器的返回值)
+    ObjType obj_type;   // 符号对象类型：函数/变量/常量
+    ValType val_type;   // 值类型: int/bool/string
+    // int addr;     // 地址。
+    // int size;     // 字节数
+    // int level;     // 层次
+};
+
+class SymTable {
+private:
+    std::map<std::string, Sym *> table_;
+public:
+    Sym *insert(std::string name);
+
+    Sym *find(std::string name);
+
+    void del(std::string name);
+
+    int size();
+
+    void print();
+
+};
+
 
 class TreeNode {
+private:
+    static std::vector<std::string> type_mapped_names;
 public:
     enum Type {
         PROGRAM,        // 程序（开始符号）节点
@@ -125,9 +189,9 @@ public:
 
     TreeNode(Type type, Token token);
 
-    std::string get_type_name(Type type);
+    std::string get_type_name();
 
-    std::string type_name();
+    static std::string type_name(Type type);
 };
 
-#endif //TINY_PLUS_COMPILER_DATA_TYPE_H
+#endif //TINY_COMPILER_CPP11_DATA_TYPES_H

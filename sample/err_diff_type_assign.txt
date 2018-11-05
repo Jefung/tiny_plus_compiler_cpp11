@@ -1,0 +1,3 @@
+int B,C;
+string A;
+A := B + C;

@@ -1,0 +1,3 @@
+int A,B,C,D;
+bool E;
+string F,G;

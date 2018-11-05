@@ -1,6 +1,6 @@
-int A,B,C,D;
+int A,B,C,D,x;
 while x>0	do
     if A=1 	then
-       A := B + D;
+       A := B + D
     end
 end

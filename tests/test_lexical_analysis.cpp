@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include <regex>
 #include <vector>
-#include "data_type.h"
+#include "data_type_copy.h_copy"
 #include "lexical_analysis.h"
 #include "./common.h"
 
@@ -55,10 +55,10 @@ TEST(experiment1, test2) {
     LexicalAnalysis a;
     std::ifstream f("../../sample/experiment1_test2_in.txt");
     istream is(f.rdbuf());
-    vector<pair<Kind::Type, string>> analysis_tokens;
+    Tokens analysis_tokens;
     std::vector<ErrorMsg> msgs = a.transfer_token(is, analysis_tokens);
     EXPECT_EQ(tokens.size(), analysis_tokens.size()) << "token数量不一样";
-    EXPECT_TRUE(compare_tokens(tokens, analysis_tokens)) << "tokens数量一样,但内容不一样";
+    EXPECT_TRUE(tokens == analysis_tokens) << "tokens数量一样,但内容不一样";
     EXPECT_EQ(msgs.size(), 0) << "错误消息行数不相等";
     // 输出错误消息
     // std::cout << msgs.size() << std::endl;
@@ -75,7 +75,7 @@ TEST(experiment1, test1) {
     LexicalAnalysis a;
     std::ifstream f("../../sample/experiment1_test1_in.txt");
     istream is(f.rdbuf());
-    vector<pair<Kind::Type, string>> analysis_tokens;
+    Tokens analysis_tokens;
     std::vector<ErrorMsg> msgs = a.transfer_token(is, analysis_tokens);
     // 输出错误消息
     // std::cout << msgs.size() << std::endl;
@@ -83,7 +83,7 @@ TEST(experiment1, test1) {
     //     std::cout << msg.to_string() << std::endl;
     // }
     EXPECT_EQ(tokens.size(), analysis_tokens.size()) << "tokens数量不一样";
-    EXPECT_TRUE(compare_tokens(tokens, analysis_tokens)) << "tokens内容不一样";
+    EXPECT_TRUE(tokens == analysis_tokens) << "tokens内容不一样";
 
     EXPECT_EQ(msgs.size(), 7) << "错误消息行数不相等";
 }

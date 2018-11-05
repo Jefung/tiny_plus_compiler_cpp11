@@ -4,7 +4,8 @@
 4) goto L0
 5) Label L3
 6) if x<100 goto L2
-7) goto L0	8) Label L2
+7) goto L0
+8) Label L2
 9) fact:=1
 10) Label L4
 11) Label L6

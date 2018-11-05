@@ -7,14 +7,13 @@
 
 #include <regex>
 #include <vector>
-#include "data_type.h"
+#include "data_types.h"
+#include "grammar_analysis.h"
 
-bool compare_tokens(const std::vector<std::pair<Kind::Type, std::string>> &t1,
-                    const std::vector<std::pair<Kind::Type, std::string>> &t2);
 
 std::vector<ErrorMsg>
-get_thining_tokens_from_file(std::string filename, std::vector<std::pair<Kind::Type, std::string>>& tokens);
+get_thining_tokens_from_file(std::string filename, Tokens &tokens);
 
-std::vector<std::pair<Kind::Type, std::string>> get_tokens_by_regex(std::string content);
-
+Tokens get_tokens_by_regex(std::string content);
+TreeNode *file_grammar_analysis(const std::string filename, ErrorMsgs &msgs);
 #endif //TINY_COMPILER_CPP11_COMMON_H

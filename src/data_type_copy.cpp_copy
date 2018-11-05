@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include <vector>
-#include "data_type.h"
 
 std::string Kind::name(Type type) {
     std::string arr[] = {

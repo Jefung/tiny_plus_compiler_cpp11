@@ -7,13 +7,13 @@
 
 
 std::vector<ErrorMsg>
-LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Type, std::string>> &tokens) {
+LexicalAnalysis::transfer_token(std::istream &is, Tokens &tokens) {
     int line_count = 1;
-    int column_count = 0;
+    unsigned long column_count = 0;
     std::string line;
     std::vector<ErrorMsg> err_msgs;
     Status status = Status::blank;
-    std::vector<std::pair<Kind::Type, std::string>> cur_line_tokens;
+    Tokens cur_line_tokens;
     CharType c_type;
     char c;
     std::string word;
@@ -26,7 +26,7 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                     case CharType::c_newline:
                         line_count++;
                         column_count = 0;
-                        tokens.insert(tokens.end(), cur_line_tokens.begin(), cur_line_tokens.end());
+                        tokens.append(cur_line_tokens);
                         cur_line_tokens.clear();
                         break;
                     case CharType::c_blank:
@@ -61,14 +61,14 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                     case CharType::c_newline:
                         line_count++;
                         column_count = 0;
-                        cur_line_tokens.emplace_back(Kind::Type::NUM, word);
-                        tokens.insert(tokens.end(), cur_line_tokens.begin(), cur_line_tokens.end());
+                        cur_line_tokens.push({Token::Kind::NUM, word, line_count, column_count - word.size()});
+                        tokens.append(cur_line_tokens);
                         cur_line_tokens.clear();
                         word = "";
                         status = Status::blank;
                         break;
                     case CharType::c_blank:
-                        cur_line_tokens.emplace_back(Kind::Type::NUM, word);
+                        cur_line_tokens.push({Token::Kind::NUM, word, line_count, column_count - word.size()});
                         word = "";
                         status = Status::blank;
                         break;
@@ -81,12 +81,12 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                         status = Status::error;
                         break;
                     case CharType::c_single_quote:
-                        cur_line_tokens.emplace_back(Kind::Type::NUM, word);
+                        cur_line_tokens.push({Token::Kind::NUM, word, line_count, column_count - word.size()});
                         word = "";
                         status = Status::single_quote;
                         break;
                     case CharType::c_special_char:
-                        cur_line_tokens.emplace_back(Kind::Type::NUM, word);
+                        cur_line_tokens.push({Token::Kind::NUM, word, line_count, column_count - word.size()});
                         word = "";
                         if (c == '{') {
                             status = Status::comment;
@@ -96,7 +96,7 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                         status = Status::special_char;
                         break;
                     case CharType::c_illegal:
-                        cur_line_tokens.emplace_back(Kind::Type::NUM, word);
+                        cur_line_tokens.push({Token::Kind::NUM, word, line_count, column_count - word.size()});
                         word = "";
                         status = Status::error;
                         break;
@@ -105,22 +105,22 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
             case Status::letter:
                 switch (c_type) {
                     case CharType::c_newline:
-                        if (Kind::is_KEY(word))
-                            cur_line_tokens.emplace_back(Kind::Type::KEY, word);
+                        if (Token::is_KEY(word))
+                            cur_line_tokens.push({Token::Kind::KEY, word, line_count, column_count - word.size()});
                         else
-                            cur_line_tokens.emplace_back(Kind::Type::ID, word);
+                            cur_line_tokens.push({Token::Kind::ID, word, line_count, column_count - word.size()});
                         word = "";
                         line_count++;
                         column_count = 0;
-                        tokens.insert(tokens.end(), cur_line_tokens.begin(), cur_line_tokens.end());
+                        tokens.append(cur_line_tokens);
                         cur_line_tokens.clear();
                         status = Status::blank;
                         break;
                     case CharType::c_blank:
-                        if (Kind::is_KEY(word))
-                            cur_line_tokens.emplace_back(Kind::Type::KEY, word);
+                        if (Token::is_KEY(word))
+                            cur_line_tokens.push({Token::Kind::KEY, word, line_count, column_count - word.size()});
                         else
-                            cur_line_tokens.emplace_back(Kind::Type::ID, word);
+                            cur_line_tokens.push({Token::Kind::ID, word, line_count, column_count - word.size()});
                         word = "";
                         status = Status::blank;
                         break;
@@ -129,26 +129,26 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                         word += c;
                         break;
                     case CharType::c_single_quote:
-                        if (Kind::is_KEY(word))
-                            cur_line_tokens.emplace_back(Kind::Type::KEY, word);
+                        if (Token::is_KEY(word))
+                            cur_line_tokens.push({Token::Kind::KEY, word, line_count, column_count - word.size()});
                         else
-                            cur_line_tokens.emplace_back(Kind::Type::ID, word);
+                            cur_line_tokens.push({Token::Kind::ID, word, line_count, column_count - word.size()});
                         word = "";
                         status = Status::single_quote;
                         break;
                     case CharType::c_special_char:
-                        if (Kind::is_KEY(word))
-                            cur_line_tokens.emplace_back(Kind::Type::KEY, word);
+                        if (Token::is_KEY(word))
+                            cur_line_tokens.push({Token::Kind::KEY, word, line_count, column_count - word.size()});
                         else
-                            cur_line_tokens.emplace_back(Kind::Type::ID, word);
+                            cur_line_tokens.push({Token::Kind::ID, word, line_count, column_count - word.size()});
                         word = c;
                         status = Status::special_char;
                         break;
                     case CharType::c_illegal:
-                        if (Kind::is_KEY(word))
-                            cur_line_tokens.emplace_back(Kind::Type::KEY, word);
+                        if (Token::is_KEY(word))
+                            cur_line_tokens.push({Token::Kind::KEY, word, line_count, column_count - word.size()});
                         else
-                            cur_line_tokens.emplace_back(Kind::Type::ID, word);
+                            cur_line_tokens.push({Token::Kind::ID, word, line_count, column_count - word.size()});
                         word = "";
                         status = Status::error;
                         err_msgs.emplace_back(ErrorMsg(line_count, column_count, "字母后面出现不合法的字符串"));
@@ -174,7 +174,7 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                         word += c;
                         break;
                     case CharType::c_single_quote:
-                        cur_line_tokens.emplace_back(Kind::Type::STR, word);
+                        cur_line_tokens.push({Token::Kind::STR, word, line_count, column_count - word.size()});
                         word = "";
                         status = Status::blank;
                         break;
@@ -192,40 +192,40 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                     case CharType::c_newline:
                         line_count++;
                         column_count = 0;
-                        cur_line_tokens.emplace_back(Kind::Type::SYM, word);
-                        tokens.insert(tokens.end(), cur_line_tokens.begin(), cur_line_tokens.end());
+                        cur_line_tokens.push({Token::Kind::SYM, word, line_count, column_count - word.size()});
+                        tokens.append(cur_line_tokens);
                         cur_line_tokens.clear();
                         word = "";
                         status = Status::blank;
                         break;
                     case CharType::c_blank:
-                        cur_line_tokens.emplace_back(Kind::Type::SYM, word);
+                        cur_line_tokens.push({Token::Kind::SYM, word, line_count, column_count - word.size()});
                         word = "";
                         status = Status::blank;
                         break;
                     case CharType::c_number:
-                        cur_line_tokens.emplace_back(Kind::Type::SYM, word);
+                        cur_line_tokens.push({Token::Kind::SYM, word, line_count, column_count - word.size()});
                         word = c;
                         status = Status::number;
                         break;
                     case CharType::c_letter:
-                        cur_line_tokens.emplace_back(Kind::Type::SYM, word);
+                        cur_line_tokens.push({Token::Kind::SYM, word, line_count, column_count - word.size()});
                         word = c;
                         status = Status::letter;
                         break;
                     case CharType::c_single_quote:
-                        cur_line_tokens.emplace_back(Kind::Type::SYM, word);
+                        cur_line_tokens.push({Token::Kind::SYM, word, line_count, column_count - word.size()});
                         word = "";
                         status = Status::single_quote;
                         break;
                     case CharType::c_special_char:
                         if ((word == ":" || word == "<" || word == ">") && c == '=') {
                             word += c;
-                            cur_line_tokens.emplace_back(Kind::Type::SYM, word);
+                            cur_line_tokens.push({Token::Kind::SYM, word, line_count, column_count - word.size()});
                             word = "";
                             status = Status::blank;
                         } else {
-                            cur_line_tokens.emplace_back(Kind::Type::SYM, word);
+                            cur_line_tokens.push({Token::Kind::SYM, word, line_count, column_count - word.size()});
                             word = c;
                             // word = "";
                             // status = Status::error;
@@ -233,7 +233,7 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
                         }
                         break;
                     case CharType::c_illegal:
-                        cur_line_tokens.emplace_back(Kind::Type::SYM, word);
+                        cur_line_tokens.push({Token::Kind::SYM, word, line_count, column_count - word.size()});
                         status = Status::error;
                         err_msgs.emplace_back(ErrorMsg(line_count, column_count, "特殊字符后面出现非法字符"));
                         break;
@@ -287,13 +287,13 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
             break;
         case Status::error:
         case Status::letter:
-            if (Kind::is_KEY(word))
-                cur_line_tokens.emplace_back(Kind::Type::KEY, word);
+            if (Token::is_KEY(word))
+                cur_line_tokens.push({Token::Kind::KEY, word, line_count, column_count - word.size()});
             else
-                cur_line_tokens.emplace_back(Kind::Type::ID, word);
+                cur_line_tokens.push({Token::Kind::ID, word, line_count, column_count - word.size()});
             break;
         case Status::special_char:
-            cur_line_tokens.emplace_back(Kind::SYM, word);
+            cur_line_tokens.push({Token::Kind::SYM, word, line_count, column_count - word.size()});
             break;
         case Status::single_quote:
             err_msgs.emplace_back(ErrorMsg(line_count, column_count - word.size(), "字符串缺少单引号匹配"));
@@ -302,10 +302,10 @@ LexicalAnalysis::transfer_token(std::istream &is, std::vector<std::pair<Kind::Ty
             err_msgs.emplace_back(ErrorMsg(line_count, column_count - word.size(), "注释标识符缺少匹配"));
             break;
         case Status::number:
-            cur_line_tokens.emplace_back(Kind::NUM, word);
+            cur_line_tokens.push({Token::Kind::NUM, word, line_count, column_count - word.size()});
             break;
     }
-    tokens.insert(tokens.end(), cur_line_tokens.begin(), cur_line_tokens.end());
+    tokens.append(cur_line_tokens);
     // for (auto token : tokens)
     //     std::cout << Kind::name(token.first) << " : " << token.second << std::endl;
     // for (auto msg : err_msgs)

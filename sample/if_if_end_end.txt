@@ -1,5 +1,6 @@
 int A,B,C,D;
 if A=1 	then
-        A := B*C+20
 		if A=1 	then
 		A := B+C+37
+		end
+end

@@ -5,37 +5,38 @@
 #ifndef TINY_COMPILER_CPP11_GRAMMAR_ANALYSIS_H
 #define TINY_COMPILER_CPP11_GRAMMAR_ANALYSIS_H
 
-#include "data_type.h"
 #include <set>
 #include <vector>
+#include "data_types.h"
 
 class GrammarAnalysis {
 private:
-    std::vector<std::pair<Kind::Type, std::string>> tokens_;
-    Token cur_token_;
-    int cur_index_;
-    using KindSet = std::set<Kind::Type>;
+    Tokens tokens_;
+    std::vector<Token>::iterator token_it_;
+    SymTable sym_table_;
+    using KindSet = std::set<Token::Kind>;
+
 public:
-    explicit GrammarAnalysis(std::vector<std::pair<Kind::Type, std::string>> token);
+    explicit GrammarAnalysis(Tokens token);
 
-    bool get_next_token(Token &token);
+    bool match(KindSet kind_set, std::string eof_error_msg = "") throw(ErrorMsg);
 
-    void token_forward(std::string no_more_token_msg = "") throw(ErrorMsg);
+    bool match_and_forward(KindSet kind_set, std::string eof_error_msg = "") throw(ErrorMsg);
 
-    bool match(std::set<Kind::Type> kind_set);
+    void print_sym_table();
 
-    bool match_and_forward(std::set<Kind::Type> kind_set);
+    int get_sym_table_size();
 
-    TreeNode *program();
+    TreeNode *program(ErrorMsgs &error_msg);
 
     void declaration();
 
-    void function_def();
-
-    void parameters_list();
-
-    void parameter();
-
+    // void function_def();
+    //
+    // void parameters_list();
+    //
+    // void parameter();
+    //
     TreeNode *stmt_sequence();
 
     TreeNode *if_stmt();

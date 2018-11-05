@@ -1,6 +1,5 @@
 int A,B,C,D;
 if A=1 	then
-    A := B + D
+		A:= B*C+37
 else
-	A:= C * B
-end
+		A:=A*2

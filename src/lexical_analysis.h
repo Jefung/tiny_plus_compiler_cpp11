@@ -8,7 +8,7 @@
 #include <fstream>
 #include <vector>
 #include <map>
-#include "data_type.h"
+#include "data_types.h"
 
 
 class LexicalAnalysis {
@@ -83,7 +83,7 @@ private:
 
 public:
     // return 错误信息 行号,列号 -> 错误信息
-    std::vector<ErrorMsg> transfer_token(std::istream &is, std::vector<std::pair<Kind::Type, std::string>> &tokens);
+    std::vector<ErrorMsg> transfer_token(std::istream &is, Tokens &tokens);
 
 };
 
